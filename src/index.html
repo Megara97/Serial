@@ -9,11 +9,30 @@
 		<script src="/socket.io/socket.io.js" charset="utf-8"></script>
 		<script>
 			const socket = io();
-			socket.on("serial:data", (data) => {
-				console.log(data);
-				document.getElementById("datosElement").innerText = data.value;
+			socket.on("scale1:server", (value) => {
+				console.log(value);
+				document.getElementById("datosElement1").innerText = value.data;
 			});
+			socket.on("scale2:server", (value) => {
+				console.log(value);
+				document.getElementById("datosElement2").innerText = value.data;
+			});
+			function actualizarSuma() {
+				const valor1 =
+					parseFloat(document.getElementById("datosElement1").innerText) ||
+					0;
+				const valor2 =
+					parseFloat(document.getElementById("datosElement2").innerText) ||
+					0;
+				const suma = valor1 + valor2;
+				document.getElementById("sumaElement").innerText = "Suma: " + suma;
+			}
 		</script>
-		<h2 id="datosElement"></h2>
+		<h2>Bascula 1</h2>
+		<h3 id="datosElement1"></h3>
+		<h2>Bascula 2</h2>
+		<h3 id="datosElement2"></h3>
+		<h2>Suma Basculas</h2>
+		<h3 id="sumaElement"></h3>
 	</body>
 </html>
