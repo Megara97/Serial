@@ -139,7 +139,7 @@ function connectSerialPort(port,parser,COM) {
 
 	parser.on("data", (data) => {
 		console.log(`Respuesta ${COM}:`, data.toString());
-		io.emit("scale3:server", {
+		io.emit("scale:server", {puerto: COM, 
 			data: data.toString(),
 		});
 	});
@@ -164,8 +164,8 @@ let port1;
 let parser1;
 let port2;
 let parser2;
-connectSerialPort(port1,parser1,"/COM3");
-connectSerialPort(port2,parser2,"/COM4");
+connectSerialPort(port1,parser1,"/COM5"); //Bascula 1
+connectSerialPort(port2,parser2,"/COM4"); //Bascula 2
 
 /*socketController.scaleChannelListening((data) => {
 	scaleController.requestToScale(portB1, data);
