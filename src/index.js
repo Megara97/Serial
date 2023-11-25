@@ -131,14 +131,28 @@ function connectSerial2() {
 connectSerial1();
 connectSerial2();
 */
+let weight;
 
 function connectSerialPort(port,parser,COM) {
 	port = new SerialPort({ path: COM, baudRate: 9600 });
-	parser = new ReadlineParser({ delimiter: "\r\n" });
+	parser = new ReadlineParser({ delimiter: "\r\n" });  CR + LF
+	//parser = new ReadlineParser({ delimiter: "\r" }); CR
+	//parser = new ReadlineParser({ delimiter: "\x03" }); ETX
+	//parser = new ReadlineParser({ delimiter: "\x03" }); EOT
+	//parser = new ReadlineParser({ delimiter: "\x02" }); STX
+	//parser = new ReadlineParser({ delimiter: "\x02" }); S0H
+
 	port.pipe(parser);
 
 	parser.on("data", (data) => {
 		console.log(`Respuesta ${COM}:`, data.toString());
+		weight = value.substring(5, 14); //Modo  RS Prt
+		weight = value.substring(5, 15); //Modo  RS Cor Protocolo 1
+		weight = value.substring(1, 7); //Modo  RS Cor Protocolo 4
+		const weightOK= weight.split('').reverse().join('')
+		//weight= parseFloat(weight)
+		console.log(weight);
+		console.log('invertido',weightOK);
 		io.emit("scale:server", {puerto: COM, 
 			data: data.toString(),
 		});
