@@ -23,6 +23,7 @@ const socketController = (() => {
       });
     },
     channelWrite: data => {
+      //console.log(data);
       socketClient.emit('client:weight', data);
     },
   };

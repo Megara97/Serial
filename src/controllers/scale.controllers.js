@@ -1,12 +1,11 @@
 import {SerialPort, ReadlineParser} from 'serialport';
-import io from '../index';
+import {io} from '../index';
 
 const scaleController = (() => {
   let ports = [];
   let parsers = [];
 
   function sendCommandToScale(port, command) {
-    console.log(ports[port]);
     ports[port].write(command, err => {
       if (err) {
         console.error('Error al enviar comando:', err.message);
@@ -25,18 +24,20 @@ const scaleController = (() => {
     let weight;
     let signo;
     parsers[port].on('data', data => {
-      //console.log(`Respuesta ${scale}:`, data.toString());
+      //console.log(`Respuesta Bascula ${port}:`, data.toString());
       const indiceTotal = data.indexOf('TOTAL');
       if (indiceTotal !== -1) {
         signo = data.substring(indiceTotal + 5, indiceTotal + 6);
         weight = data.substring(indiceTotal + 6, indiceTotal + 14);
         weight = signo === '-' ? parseFloat(weight) * -1 : parseFloat(weight);
+        console.log(`Peso DEFINITIVO Bascula ${port}:`, weight);
       } else {
         signo = data.substring(5, 6);
         weight = data.substring(6, 13);
         weight = signo === '-' ? parseFloat(weight) * -1 : parseFloat(weight);
+        console.log(`Peso Bascula ${port}:`, weight);
       }
-      console.log(`Peso Bascula ${port}:`, weight);
+      //console.log(`Peso Bascula ${port}:`, weight);
       io.emit('client:weight', {scale: port, data: weight});
       sendSocket({scale: port, data: weight});
     });
@@ -56,30 +57,9 @@ const scaleController = (() => {
     });
   }
 
-  function readSerialPort(port, sendSocket) {
-    let weight;
-    let signo;
-    parsers[port].on('data', data => {
-      //console.log(`Respuesta ${scale}:`, data.toString());
-      const indiceTotal = data.indexOf('TOTAL');
-      if (indiceTotal !== -1) {
-        signo = data.substring(indiceTotal + 5, indiceTotal + 6);
-        weight = data.substring(indiceTotal + 6, indiceTotal + 14);
-        weight = signo === '-' ? parseFloat(weight) * -1 : parseFloat(weight);
-      } else {
-        signo = data.substring(5, 6);
-        weight = data.substring(6, 13);
-        weight = signo === '-' ? parseFloat(weight) * -1 : parseFloat(weight);
-      }
-      console.log(`Peso Bascula ${port}:`, weight);
-      sendSocket({scale: port, data: weight});
-      //io.emit('scale:server', {scale: scale, data: weight});
-    });
-  }
-
   return {
     requestToScale: (port, data = {}) => {
-      console.log(data);
+      //console.log(data);
       const {instruction} = data;
       let command = 'R';
       if (instruction === 'Tare') {
@@ -94,17 +74,7 @@ const scaleController = (() => {
       sendCommandToScale(port, command);
     },
     connectScale: (port, COM, sendSocket) => {
-      //connectSerialPort(1, '/COM5'); //Bascula 1 COM5
-      //connectSerialPort(2, '/COM3'); //Bascula 2 COM6
-      //connectSerialPort(3, '/dev/ttyACM0'); //Bascula 3
       connectSerialPort(port, COM, sendSocket);
-    },
-
-    readScale: (port, sendSocket) => {
-      //readSerialPort(1);
-      //readSerialPort(2);
-      //readSerialPort(3);
-      readSerialPort(port, sendSocket);
     },
   };
 })();
