@@ -31,8 +31,8 @@ io.on('connection', socket => {
 //Conectar las basculas, recibir el peso y enviar a socket
 //scaleController.connectScale(1, '/COM5', socketController.channelWrite); //Bascula 1 COM5
 //scaleController.connectScale(2, '/COM6', socketController.channelWrite); //Bascula 2 COM6
-scaleController.connectScale(3, '/COM3', socketController.channelWrite); //Bascula 3 COM?
-//connectSerialPort(3, '/dev/ttyACM0', socketController.channelWrite); //Prueba Ubuntu
+//scaleController.connectScale(3, '/COM3', socketController.channelWrite); //Bascula 3 COM?
+scaleController.connectScale(3, '/dev/ttyACM0', socketController.channelWrite); //Prueba Ubuntu
 
 //Escuchar socket y mandar comando a bascula 3 (pedir peso)
 socketController.channelListening(data => {

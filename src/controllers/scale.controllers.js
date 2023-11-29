@@ -17,26 +17,56 @@ const scaleController = (() => {
 
   function connectSerialPort(port, COM, sendSocket) {
     ports[port] = new SerialPort({path: COM, baudRate: 9600});
-    parsers[port] = new ReadlineParser({delimiter: 'g\r\n'});
+    //parsers[port] = new ReadlineParser({delimiter: 'g\r\n'}); //BASCULAS INICIALES
+    parsers[port] = new ReadlineParser({delimiter: '\r\n'}); //BASCULA FINAL (verificar)
 
     ports[port].pipe(parsers[port]);
 
     let weight;
-    let signo;
+    let sign;
     parsers[port].on('data', data => {
-      //console.log(`Respuesta Bascula ${port}:`, data.toString());
-      const indiceTotal = data.indexOf('TOTAL');
-      if (indiceTotal !== -1) {
-        signo = data.substring(indiceTotal + 5, indiceTotal + 6);
-        weight = data.substring(indiceTotal + 6, indiceTotal + 14);
-        weight = signo === '-' ? parseFloat(weight) * -1 : parseFloat(weight);
-        console.log(`Peso DEFINITIVO Bascula ${port}:`, weight);
+      //console.log(`Respuesta Bascula ${port}:\n${data.toString()}`);
+      // Iterar sobre cada carácter e imprimir su código ASCII
+      /*console.log(`Respuesta:`);
+      for (let i = 0; i < data.length; i++) {
+        const codigoAscii = data.charCodeAt(i);
+        console.log(`Carácter ${i}: ${data[i]} (Código ASCII: ${codigoAscii})`);
+      }*/
+
+      if (port != 3) {
+        //BASCULAS INICIALES (Indices verificados)
+        const indiceTotal = data.indexOf('TOTAL');
+        if (indiceTotal !== -1) {
+          //Modo Print
+          sign = data.substring(indiceTotal + 5, indiceTotal + 6);
+          weight = data.substring(indiceTotal + 6, indiceTotal + 14);
+          weight = sign === '-' ? parseFloat(weight) * -1 : parseFloat(weight);
+          console.log(`Peso DEFINITIVO Bascula ${port}:`, weight);
+        } else {
+          //Modo Continuo
+          sign = data.substring(5, 6);
+          weight = data.substring(6, 13);
+          weight = sign === '-' ? parseFloat(weight) * -1 : parseFloat(weight);
+          console.log(`Peso Bascula ${port}:`, weight);
+        }
       } else {
-        signo = data.substring(5, 6);
-        weight = data.substring(6, 13);
-        weight = signo === '-' ? parseFloat(weight) * -1 : parseFloat(weight);
-        console.log(`Peso Bascula ${port}:`, weight);
+        //BASCULA FINAL (Falta verificar indices)
+        const indiceTotal = data.indexOf('GROSS');
+        if (indiceTotal !== -1) {
+          //Modo Print
+          sign = data.substring(indiceTotal + 9, indiceTotal + 10);
+          weight = data.substring(indiceTotal + 10, indiceTotal + 15);
+          weight = sign === '-' ? parseFloat(weight) * -1 : parseFloat(weight);
+          console.log(`Peso DEFINITIVO Bascula ${port}:`, weight);
+        } else {
+          //Modo Continuo
+          sign = data.substring(1, 2);
+          weight = data.substring(2, 10);
+          weight = sign === '-' ? parseFloat(weight) * -1 : parseFloat(weight);
+          console.log(`Peso Bascula ${port}:`, weight);
+        }
       }
+
       //console.log(`Peso Bascula ${port}:`, weight);
       io.emit('client:weight', {scale: port, data: weight});
       sendSocket({scale: port, data: weight});
