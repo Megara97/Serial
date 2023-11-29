@@ -3,7 +3,7 @@ import {sendPage, sendWeight} from '../controllers/index.controllers';
 
 const router = Router();
 
-router.get('/', sendPage);
+router.get('/page', sendPage);
 
 router.get('/weight', sendWeight);
 

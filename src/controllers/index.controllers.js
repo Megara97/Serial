@@ -1,7 +1,18 @@
 import path from 'path';
+import ioClient from 'socket.io-client';
 
 export const sendWeight = async (req, res) => {
-  res.json({scale: 'Bascula 3', data: 50});
+  const socket = ioClient('http://localhost:3000', {
+    // extraHeaders: {
+    //   'Content-Type': 'application/json',
+    // },
+  });
+
+  socket.on('client:weight', value => {
+    console.log(value);
+    res.json(value);
+  });
+  //res.json({scale: 3, data: 540});
 };
 
 export const sendPage = async (req, res) => {

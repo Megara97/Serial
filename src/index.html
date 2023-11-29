@@ -9,11 +9,11 @@
     <script src="/socket.io/socket.io.js" charset="utf-8"></script>
     <script>
       const socket = io();
-      socket.on('scale:server', value => {
+      socket.on('client:weight', value => {
         console.log(value);
         document.getElementById('datosElement1').innerText = value.data;
       });
-      socket.on('scale:server', value => {
+      socket.on('client:weight', value => {
         console.log(value);
         document.getElementById('datosElement2').innerText = value.data;
       });

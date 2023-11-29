@@ -1,4 +1,5 @@
 import {SerialPort, ReadlineParser} from 'serialport';
+import io from '../index';
 
 const scaleController = (() => {
   let ports = [];
@@ -36,6 +37,7 @@ const scaleController = (() => {
         weight = signo === '-' ? parseFloat(weight) * -1 : parseFloat(weight);
       }
       console.log(`Peso Bascula ${port}:`, weight);
+      io.emit('client:weight', {scale: port, data: weight});
       sendSocket({scale: port, data: weight});
     });
 
@@ -71,6 +73,7 @@ const scaleController = (() => {
       }
       console.log(`Peso Bascula ${port}:`, weight);
       sendSocket({scale: port, data: weight});
+      //io.emit('scale:server', {scale: scale, data: weight});
     });
   }
 

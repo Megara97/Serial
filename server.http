@@ -1,6 +1,9 @@
 @api= http://localhost:3000
 
+GET {{api}}
+
+###
 GET {{api}}/weight
 
 ###
-GET {{api}}
+GET {{api}}/page
