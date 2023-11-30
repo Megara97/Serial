@@ -15,7 +15,7 @@ const scaleController = (() => {
     });
   }
 
-  function connectSerialPort(port, COM, sendSocket) {
+  function connectSerialPort(port, COM) {
     ports[port] = new SerialPort({path: COM, baudRate: 9600});
     //parsers[port] = new ReadlineParser({delimiter: 'g\r\n'}); //BASCULAS INICIALES
     parsers[port] = new ReadlineParser({delimiter: '\r\n'}); //BASCULA FINAL (verificar)
@@ -68,8 +68,7 @@ const scaleController = (() => {
       }
 
       //console.log(`Peso Bascula ${port}:`, weight);
-      io.emit('client:weight', {scale: port, data: weight});
-      sendSocket({scale: port, data: weight});
+      io.emit('server:weight', {scale: port, data: weight}); //Socket local
     });
 
     ports[port].on('open', () => {
@@ -103,8 +102,8 @@ const scaleController = (() => {
       }
       sendCommandToScale(port, command);
     },
-    connectScale: (port, COM, sendSocket) => {
-      connectSerialPort(port, COM, sendSocket);
+    connectScale: (port, COM) => {
+      connectSerialPort(port, COM);
     },
   };
 })();
