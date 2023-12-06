@@ -35,14 +35,15 @@ io.on('connection', function (socket) {
 });
 
 //BASCULAS INICIALES (Mini PC)
-// scaleController.connectScale(1, '/COM6'); //Bascula 1 COM6
-// scaleController.connectScale(2, '/COM5'); //Bascula 2 COM5
+_scale["default"].connectScale(1, '/COM6'); //Bascula 1 COM6
+_scale["default"].connectScale(2, '/COM5'); //Bascula 2 COM5
 
 //BASCULA FINAL (PC)
 // scaleController.connectScale(3, '/COM3'); //Bascula 3 COM?
 
 //Prueba Ubuntu
-_scale["default"].connectScale(3, '/dev/ttyACM0');
+//scaleController.connectScale(3, '/dev/ttyACM0');
+
 server.listen(app.get('port'), function () {
   console.log('Server on port', app.get('port'));
 });

@@ -48,10 +48,13 @@ var scaleController = function () {
         var indiceAVG = data.indexOf('AVG');
         if (indiceTotal !== -1) {
           //Modo Print
-          sign[port] = data.substring(indiceTotal + 5, indiceTotal + 6);
+          /*sign[port] = data.substring(indiceTotal + 5, indiceTotal + 6);
           weight[port] = data.substring(indiceTotal + 6, indiceTotal + 14);
-          weight[port] = sign[port] === '-' ? parseFloat(weight[port]) * -1 : parseFloat(weight[port]);
-          //console.log(`Peso DEFINITIVO Bascula ${port}:`, weight[port]);
+          weight[port] =
+            sign[port] === '-'
+              ? parseFloat(weight[port]) * -1
+              : parseFloat(weight[port]);
+          //console.log(`Peso DEFINITIVO Bascula ${port}:`, weight[port]);*/
           console.log("Peso DEFINITIVO Bascula ".concat(port, ":"), weightCont[port]);
           _index.io.emit('server:weight', {
             scale: port,
@@ -63,7 +66,7 @@ var scaleController = function () {
             signCont[port] = data.substring(5, 6);
             weightCont[port] = data.substring(6, 13);
             weightCont[port] = signCont[port] === '-' ? parseFloat(weightCont[port]) * -1 : parseFloat(weightCont[port]);
-            //console.log(`Peso Bascula ${port}:`, weightCont);
+            //console.log(`Peso Bascula ${port}:`, weightCont[port]);
           }
         }
       } else {
@@ -71,10 +74,13 @@ var scaleController = function () {
         var _indiceTotal = data.indexOf('GROSS');
         if (_indiceTotal !== -1) {
           //Modo Print
-          sign[port] = data.substring(_indiceTotal + 9, _indiceTotal + 10);
-          weight[port] = data.substring(_indiceTotal + 10, _indiceTotal + 15);
-          weight[port] = sign[port] === '-' ? parseFloat(weight[port]) * -1 : parseFloat(weight[port]);
-          //console.log(`Peso DEFINITIVO Bascula ${port}:`, weight[port]);
+          /*sign[port] = data.substring(indiceTotal + 9, indiceTotal + 10);
+          weight[port] = data.substring(indiceTotal + 10, indiceTotal + 15);
+          weight[port] =
+            sign[port] === '-'
+              ? parseFloat(weight[port]) * -1
+              : parseFloat(weight[port]);
+          //console.log(`Peso DEFINITIVO Bascula ${port}:`, weight[port]);*/
           console.log("Peso DEFINITIVO Bascula ".concat(port, ":"), weightCont[port]);
           _index.io.emit('server:weight', {
             scale: port,
