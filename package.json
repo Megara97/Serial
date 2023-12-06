@@ -1,27 +1,27 @@
 {
-	"name": "servidorbasculalocal",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
-	"scripts": {
-		"build": "babel src -d -dist",
-		"dev": "nodemon src --exec babel-node",
-		"start": "node dist"
-	},
-	"author": "",
-	"license": "ISC",
-	"dependencies": {
-		"dotenv": "^16.3.1",
-		"express": "^4.18.2",
-		"serialport": "^12.0.0",
-		"socket.io": "^4.7.2",
-		"socket.io-client": "^4.7.2"
-	},
-	"devDependencies": {
-		"@babel/cli": "^7.23.0",
-		"@babel/core": "^7.23.3",
-		"@babel/node": "^7.22.19",
-		"@babel/preset-env": "^7.23.3",
-		"nodemon": "^3.0.1"
-	}
+  "name": "servidorbasculalocal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "babel src -d dist",
+    "dev": "nodemon src --exec babel-node",
+    "start": "node dist"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "serialport": "^12.0.0",
+    "socket.io": "^4.7.2",
+    "socket.io-client": "^4.7.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.23.0",
+    "@babel/core": "^7.23.3",
+    "@babel/node": "^7.22.19",
+    "@babel/preset-env": "^7.23.3",
+    "nodemon": "^3.0.1"
+  }
 }

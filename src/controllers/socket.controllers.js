@@ -1,5 +1,5 @@
 import ioClient from 'socket.io-client';
-import config from '../../config';
+import config from '../config';
 
 const socketController = (() => {
   const socketClient = ioClient(config.HOST_SERVER_SOCKET, {
@@ -18,13 +18,13 @@ const socketController = (() => {
 
   return {
     channelListening: handleScaleData => {
-      socketClient.on('server:weight', data => {
+      socketClient.on('client:weight', data => {
         handleScaleData(data);
       });
     },
     channelWrite: data => {
       //console.log(data);
-      socketClient.emit('client:weight', data);
+      socketClient.emit('server:weight', data);
     },
   };
 })();
