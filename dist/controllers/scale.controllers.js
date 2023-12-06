@@ -9,6 +9,10 @@ var _index = require("../index");
 var scaleController = function () {
   var ports = [];
   var parsers = [];
+  var weight = [];
+  var weightCont = [];
+  var sign = [];
+  var signCont = [];
   function sendCommandToScale(port, command) {
     ports[port].write(command, function (err) {
       if (err) {
@@ -23,14 +27,12 @@ var scaleController = function () {
       path: COM,
       baudRate: 9600
     });
-    //parsers[port] = new ReadlineParser({delimiter: 'g\r\n'}); //BASCULAS INICIALES
     parsers[port] = new _serialport.ReadlineParser({
-      delimiter: '\r\n'
-    }); //BASCULA FINAL (verificar)
+      delimiter: 'g\r\n'
+    }); //BASCULAS INICIALES
+    //parsers[port] = new ReadlineParser({delimiter: '\r\n'}); //BASCULA FINAL (verificar)
 
     ports[port].pipe(parsers[port]);
-    var weight;
-    var sign;
     parsers[port].on('data', function (data) {
       //console.log(`Respuesta Bascula ${port}:\n${data.toString()}`);
       // Iterar sobre cada carácter e imprimir su código ASCII
@@ -43,42 +45,49 @@ var scaleController = function () {
       if (port != 3) {
         //BASCULAS INICIALES (Indices verificados)
         var indiceTotal = data.indexOf('TOTAL');
+        var indiceAVG = data.indexOf('AVG');
         if (indiceTotal !== -1) {
           //Modo Print
-          sign = data.substring(indiceTotal + 5, indiceTotal + 6);
-          weight = data.substring(indiceTotal + 6, indiceTotal + 14);
-          weight = sign === '-' ? parseFloat(weight) * -1 : parseFloat(weight);
-          console.log("Peso DEFINITIVO Bascula ".concat(port, ":"), weight);
+          sign[port] = data.substring(indiceTotal + 5, indiceTotal + 6);
+          weight[port] = data.substring(indiceTotal + 6, indiceTotal + 14);
+          weight[port] = sign[port] === '-' ? parseFloat(weight[port]) * -1 : parseFloat(weight[port]);
+          //console.log(`Peso DEFINITIVO Bascula ${port}:`, weight[port]);
+          console.log("Peso DEFINITIVO Bascula ".concat(port, ":"), weightCont[port]);
+          _index.io.emit('server:weight', {
+            scale: port,
+            data: weightCont[port]
+          }); //Socket local
         } else {
-          //Modo Continuo
-          sign = data.substring(5, 6);
-          weight = data.substring(6, 13);
-          weight = sign === '-' ? parseFloat(weight) * -1 : parseFloat(weight);
-          console.log("Peso Bascula ".concat(port, ":"), weight);
+          if (indiceAVG === -1) {
+            //Modo Continuo
+            signCont[port] = data.substring(5, 6);
+            weightCont[port] = data.substring(6, 13);
+            weightCont[port] = signCont[port] === '-' ? parseFloat(weightCont[port]) * -1 : parseFloat(weightCont[port]);
+            //console.log(`Peso Bascula ${port}:`, weightCont);
+          }
         }
       } else {
         //BASCULA FINAL (Falta verificar indices)
         var _indiceTotal = data.indexOf('GROSS');
         if (_indiceTotal !== -1) {
           //Modo Print
-          sign = data.substring(_indiceTotal + 9, _indiceTotal + 10);
-          weight = data.substring(_indiceTotal + 10, _indiceTotal + 15);
-          weight = sign === '-' ? parseFloat(weight) * -1 : parseFloat(weight);
-          console.log("Peso DEFINITIVO Bascula ".concat(port, ":"), weight);
+          sign[port] = data.substring(_indiceTotal + 9, _indiceTotal + 10);
+          weight[port] = data.substring(_indiceTotal + 10, _indiceTotal + 15);
+          weight[port] = sign[port] === '-' ? parseFloat(weight[port]) * -1 : parseFloat(weight[port]);
+          //console.log(`Peso DEFINITIVO Bascula ${port}:`, weight[port]);
+          console.log("Peso DEFINITIVO Bascula ".concat(port, ":"), weightCont[port]);
+          _index.io.emit('server:weight', {
+            scale: port,
+            data: weightCont[port]
+          }); //Socket local
         } else {
           //Modo Continuo
-          sign = data.substring(1, 2);
-          weight = data.substring(2, 10);
-          weight = sign === '-' ? parseFloat(weight) * -1 : parseFloat(weight);
-          console.log("Peso Bascula ".concat(port, ":"), weight);
+          signCont[port] = data.substring(1, 2);
+          weightCont[port] = data.substring(2, 10);
+          weightCont[port] = signCont[port] === '-' ? parseFloat(weightCont[port]) * -1 : parseFloat(weightCont[port]);
+          //console.log(`Peso Bascula ${port}:`, weightCont[port]);
         }
       }
-
-      //console.log(`Peso Bascula ${port}:`, weight);
-      _index.io.emit('server:weight', {
-        scale: port,
-        data: weight
-      }); //Socket local
     });
 
     ports[port].on('open', function () {
