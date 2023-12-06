@@ -60,7 +60,7 @@ const scaleController = (() => {
               signCont[port] === '-'
                 ? parseFloat(weightCont[port]) * -1
                 : parseFloat(weightCont[port]);
-            //console.log(`Peso Bascula ${port}:`, weightCont);
+            //console.log(`Peso Bascula ${port}:`, weightCont[port]);
           }
         }
       } else {
@@ -68,13 +68,13 @@ const scaleController = (() => {
         const indiceTotal = data.indexOf('GROSS');
         if (indiceTotal !== -1) {
           //Modo Print
-          sign[port] = data.substring(indiceTotal + 9, indiceTotal + 10);
+          /*sign[port] = data.substring(indiceTotal + 9, indiceTotal + 10);
           weight[port] = data.substring(indiceTotal + 10, indiceTotal + 15);
           weight[port] =
             sign[port] === '-'
               ? parseFloat(weight[port]) * -1
               : parseFloat(weight[port]);
-          //console.log(`Peso DEFINITIVO Bascula ${port}:`, weight[port]);
+          //console.log(`Peso DEFINITIVO Bascula ${port}:`, weight[port]);*/
           console.log(`Peso DEFINITIVO Bascula ${port}:`, weightCont[port]);
           io.emit('server:weight', {scale: port, data: weightCont[port]}); //Socket local
           sendSocket({scale: port, data: weightCont[port]});

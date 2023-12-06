@@ -33,15 +33,17 @@ io.on('connection', socket => {
 });
 
 //BASCULAS INICIALES (Mini PC)
-//scaleController.connectScale(1, '/COM6', socketController.channelWrite); //Bascula 1 COM6
-//scaleController.connectScale(2, '/COM5', socketController.channelWrite); //Bascula 2 COM5
+scaleController.connectScale(1, '/COM6', socketController.channelWrite); //Bascula 1 COM6
+scaleController.connectScale(2, '/COM5', socketController.channelWrite); //Bascula 2 COM5
 
 //BASCULA FINAL (PC)
 //scaleController.connectScale(3, '/COM3', socketController.channelWrite); //Bascula 3 COM?
 
-scaleController.connectScale(3, '/dev/ttyACM0', socketController.channelWrite); //Prueba Ubuntu
+//Prueba Ubuntu
+//scaleController.connectScale(3, '/dev/ttyACM0', socketController.channelWrite);
 
-//BASCULA FINAL (PC)   //Escuchar cliente y mandar comando a bascula final (pedir peso)
+//BASCULA FINAL (PC)
+//Escuchar cliente y mandar comando a bascula final (pedir peso)
 /*socketController.channelListening(data => {
   scaleController.requestToScale(3, data);
 });*/
