@@ -23,19 +23,23 @@ const scaleController = (() => {
   function connectSerialPort(port, COM) {
     ports[port] = new SerialPort({path: COM, baudRate: 9600});
     parsers[port] = new ReadlineParser({delimiter: 'g\r\n'}); //BASCULAS INICIALES
-    //parsers[port] = new ReadlineParser({delimiter: '\r\n'}); //BASCULA FINAL (verificar)
-
+    // parsers[port] = new ReadlineParser({delimiter: '\r\n'}); //BASCULA FINAL (verificar)
+    // parsers[port] = new ReadlineParser();
     ports[port].pipe(parsers[port]);
 
     parsers[port].on('data', data => {
-      //console.log(`Respuesta Bascula ${port}:\n${data.toString()}`);
+      console.log(`Respuesta Bascula ${port}:\n${data.toString()}`);
+      
+      
       // Iterar sobre cada carácter e imprimir su código ASCII
       /*console.log(`Respuesta:`);
       for (let i = 0; i < data.length; i++) {
         const codigoAscii = data.charCodeAt(i);
         console.log(`Carácter ${i}: ${data[i]} (Código ASCII: ${codigoAscii})`);
       }*/
-
+      let dataParse = data.toString().split("Gross")
+      dataParse = dataParse[dataParse.length - 1].split("k")[0].trim()
+      console.log(dataParse)
       if (port != 3) {
         //BASCULAS INICIALES (Indices verificados)
         const indiceTotal = data.indexOf('TOTAL');
@@ -68,6 +72,8 @@ const scaleController = (() => {
         //BASCULA FINAL (Falta verificar indices)
         const indiceTotal = data.indexOf('GROSS');
         if (indiceTotal !== -1) {
+          
+      
           //Modo Print
           /*sign[port] = data.substring(indiceTotal + 9, indiceTotal + 10);
           weight[port] = data.substring(indiceTotal + 10, indiceTotal + 15);
@@ -77,6 +83,8 @@ const scaleController = (() => {
               : parseFloat(weight[port]);
           //console.log(`Peso DEFINITIVO Bascula ${port}:`, weight[port]);*/
           console.log(`Peso DEFINITIVO Bascula ${port}:`, weightCont[port]);
+          console.log(dataParse)
+          
           io.emit('server:weight', {scale: port, data: weightCont[port]}); //Socket local
           postDataScale(port, weightCont[port]); //Web Socket
         } else {
