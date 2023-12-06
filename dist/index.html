@@ -9,18 +9,22 @@
     <script src="/socket.io/socket.io.js" charset="utf-8"></script>
     <script>
       const socket = io();
-      socket.on('client:weight', value => {
+      socket.on('server:weight', value => {
         console.log(value);
-        document.getElementById('datosElement1').innerText = value.data;
-      });
-      socket.on('client:weight', value => {
-        console.log(value);
-        document.getElementById('datosElement2').innerText = value.data;
+        if (value.scale === 1) {
+          document.getElementById('datosElement1').innerText = value.data;
+        } else if (value.scale === 2) {
+          document.getElementById('datosElement2').innerText = value.data;
+        } else if (value.scale === 3) {
+          document.getElementById('datosElement3').innerText = value.data;
+        }
       });
     </script>
     <h2>Bascula 1</h2>
     <h3 id="datosElement1"></h3>
     <h2>Bascula 2</h2>
     <h3 id="datosElement2"></h3>
+    <h2>Bascula 3</h2>
+    <h3 id="datosElement3"></h3>
   </body>
 </html>

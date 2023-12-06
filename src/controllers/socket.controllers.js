@@ -1,32 +1,25 @@
-import ioClient from 'socket.io-client';
 import config from '../config';
+import axios from 'axios';
 
-const socketController = (() => {
-  const socketClient = ioClient(config.HOST_SERVER_SOCKET, {
-    extraHeaders: {
-      'Content-Type': 'application/json',
-    },
-  });
+const scales = {
+  //Bafar: '164',
+  Bafar: '1', //Socket de prueba
+};
 
-  socketClient.on('connect', () => {
-    socketClient.emit('joinRoom', 'scales_164');
-  });
-
-  socketClient.on('connect_error', error => {
-    console.log('Connection error:', error.message);
-  });
-
-  return {
-    channelListening: handleScaleData => {
-      socketClient.on('client:weight', data => {
-        handleScaleData(data);
-      });
-    },
-    channelWrite: data => {
-      //console.log(data);
-      socketClient.emit('server:weight', data);
-    },
-  };
-})();
-
-export default socketController;
+export const postDataScale = async (port, weight) => {
+  try {
+    const res = await axios.post(config.HOST_SERVER_SOCKET + '/scale/weight', {
+      items: {
+        company_id: scales['Bafar'],
+        data: {
+          scale: port,
+          data: weight,
+        },
+      },
+    });
+    console.log(res.data);
+    return await res.data;
+  } catch (error) {
+    console.error(error);
+  }
+};

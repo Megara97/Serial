@@ -1,5 +1,6 @@
 import {SerialPort, ReadlineParser} from 'serialport';
 import {io} from '../index';
+import {postDataScale} from './socket.controllers';
 
 const scaleController = (() => {
   let ports = [];
@@ -19,7 +20,7 @@ const scaleController = (() => {
     });
   }
 
-  function connectSerialPort(port, COM, sendSocket) {
+  function connectSerialPort(port, COM) {
     ports[port] = new SerialPort({path: COM, baudRate: 9600});
     parsers[port] = new ReadlineParser({delimiter: 'g\r\n'}); //BASCULAS INICIALES
     //parsers[port] = new ReadlineParser({delimiter: '\r\n'}); //BASCULA FINAL (verificar)
@@ -50,7 +51,7 @@ const scaleController = (() => {
           console.log(`Peso DEFINITIVO Bascula ${port}:`, weight[port]);*/
           console.log(`Peso DEFINITIVO Bascula ${port}:`, weightCont[port]);
           io.emit('server:weight', {scale: port, data: weightCont[port]}); //Socket local
-          sendSocket({scale: port, data: weightCont[port]});
+          postDataScale(port, weightCont[port]); //Web Socket
         } else {
           if (indiceAVG === -1) {
             //Modo Continuo
@@ -77,7 +78,7 @@ const scaleController = (() => {
           //console.log(`Peso DEFINITIVO Bascula ${port}:`, weight[port]);*/
           console.log(`Peso DEFINITIVO Bascula ${port}:`, weightCont[port]);
           io.emit('server:weight', {scale: port, data: weightCont[port]}); //Socket local
-          sendSocket({scale: port, data: weightCont[port]});
+          postDataScale(port, weightCont[port]); //Web Socket
         } else {
           //Modo Continuo
           signCont[port] = data.substring(1, 2);
@@ -122,8 +123,8 @@ const scaleController = (() => {
       }
       sendCommandToScale(port, command);
     },
-    connectScale: (port, COM, sendSocket) => {
-      connectSerialPort(port, COM, sendSocket);
+    connectScale: (port, COM) => {
+      connectSerialPort(port, COM);
     },
   };
 })();

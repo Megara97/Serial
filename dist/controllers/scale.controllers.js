@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _serialport = require("serialport");
 var _index = require("../index");
+var _socket = require("./socket.controllers");
 var scaleController = function () {
   var ports = [];
   var parsers = [];
@@ -22,7 +23,7 @@ var scaleController = function () {
       }
     });
   }
-  function connectSerialPort(port, COM, sendSocket) {
+  function connectSerialPort(port, COM) {
     ports[port] = new _serialport.SerialPort({
       path: COM,
       baudRate: 9600
@@ -60,10 +61,7 @@ var scaleController = function () {
             scale: port,
             data: weightCont[port]
           }); //Socket local
-          sendSocket({
-            scale: port,
-            data: weightCont[port]
-          });
+          (0, _socket.postDataScale)(port, weightCont[port]); //Web Socket
         } else {
           if (indiceAVG === -1) {
             //Modo Continuo
@@ -90,10 +88,7 @@ var scaleController = function () {
             scale: port,
             data: weightCont[port]
           }); //Socket local
-          sendSocket({
-            scale: port,
-            data: weightCont[port]
-          });
+          (0, _socket.postDataScale)(port, weightCont[port]); //Web Socket
         } else {
           //Modo Continuo
           signCont[port] = data.substring(1, 2);
@@ -137,8 +132,8 @@ var scaleController = function () {
       }
       sendCommandToScale(port, command);
     },
-    connectScale: function connectScale(port, COM, sendSocket) {
-      connectSerialPort(port, COM, sendSocket);
+    connectScale: function connectScale(port, COM) {
+      connectSerialPort(port, COM);
     }
   };
 }();

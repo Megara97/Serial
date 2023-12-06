@@ -1,18 +1,9 @@
 import path from 'path';
-import ioClient from 'socket.io-client';
+import {io} from '../index';
 
 export const sendWeight = async (req, res) => {
-  /*const socket = ioClient('http://localhost:3000', {
-     extraHeaders: {
-       'Content-Type': 'application/json',
-     },
-  });
-
-  socket.on('client:weight', value => {
-    console.log(value);
-    res.json(value);
-  });*/
-  res.json({scale: 3, data: 540});
+  res.json({scale: 2, data: 540});
+  io.emit('server:weight', {scale: 2, data: 540});
 };
 
 export const sendPage = async (req, res) => {
