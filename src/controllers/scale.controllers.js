@@ -21,8 +21,8 @@ const scaleController = (() => {
 
   function connectSerialPort(port, COM) {
     ports[port] = new SerialPort({path: COM, baudRate: 9600});
-    //parsers[port] = new ReadlineParser({delimiter: 'g\r\n'}); //BASCULAS INICIALES
-    parsers[port] = new ReadlineParser({delimiter: '\r\n'}); //BASCULA FINAL (verificar)
+    parsers[port] = new ReadlineParser({delimiter: 'g\r\n'}); //BASCULAS INICIALES
+    //parsers[port] = new ReadlineParser({delimiter: '\r\n'}); //BASCULA FINAL (verificar)
 
     ports[port].pipe(parsers[port]);
 
