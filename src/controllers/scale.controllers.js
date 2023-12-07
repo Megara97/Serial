@@ -1,6 +1,6 @@
-import {SerialPort, ReadlineParser} from 'serialport';
-import {io} from '../index';
-import {postDataScale} from './socket.controllers';
+import { SerialPort, ReadlineParser } from 'serialport';
+import { io } from '../index';
+import { postDataScale } from './socket.controllers';
 
 const scaleController = (() => {
   let ports = [];
@@ -9,9 +9,11 @@ const scaleController = (() => {
   let weightCont = [];
   let sign = [];
   let signCont = [];
+  let prevData = 0;
+  let time;
 
   function sendCommandToScale(port, command) {
-    ports[port].write(command, err => {
+    ports[3].write(command, err => {
       if (err) {
         console.error('Error al enviar comando:', err.message);
       } else {
@@ -21,27 +23,15 @@ const scaleController = (() => {
   }
 
   function connectSerialPort(port, COM) {
-    ports[port] = new SerialPort({path: COM, baudRate: 9600});
-    parsers[port] = new ReadlineParser({delimiter: 'g\r\n'}); //BASCULAS INICIALES
-    // parsers[port] = new ReadlineParser({delimiter: '\r\n'}); //BASCULA FINAL (verificar)
-    // parsers[port] = new ReadlineParser();
+    ports[port] = new SerialPort({ path: COM, baudRate: 9600 });
+    // parsers[port] = new ReadlineParser({ delimiter: 'g\r\n' }); //BASCULAS INICIALES
+    parsers[port] = new ReadlineParser({delimiter: '\r\n'}); //BASCULA FINAL
     ports[port].pipe(parsers[port]);
 
     parsers[port].on('data', data => {
-      console.log(`Respuesta Bascula ${port}:\n${data.toString()}`);
-      
-      
-      // Iterar sobre cada carácter e imprimir su código ASCII
-      /*console.log(`Respuesta:`);
-      for (let i = 0; i < data.length; i++) {
-        const codigoAscii = data.charCodeAt(i);
-        console.log(`Carácter ${i}: ${data[i]} (Código ASCII: ${codigoAscii})`);
-      }*/
-      let dataParse = data.toString().split("Gross")
-      dataParse = dataParse[dataParse.length - 1].split("k")[0].trim()
-      console.log(dataParse)
+      //console.log(`Respuesta Bascula ${port}:\n${data.toString()}`);
       if (port != 3) {
-        //BASCULAS INICIALES (Indices verificados)
+        //BASCULAS INICIALES
         const indiceTotal = data.indexOf('TOTAL');
         const indiceAVG = data.indexOf('AVG');
         if (indiceTotal !== -1) {
@@ -54,7 +44,7 @@ const scaleController = (() => {
               : parseFloat(weight[port]);
           console.log(`Peso DEFINITIVO Bascula ${port}:`, weight[port]);*/
           console.log(`Peso DEFINITIVO Bascula ${port}:`, weightCont[port]);
-          io.emit('server:weight', {scale: port, data: weightCont[port]}); //Socket local
+          io.emit('server:weight', { scale: port, data: weightCont[port] }); //Socket local
           postDataScale(port, weightCont[port]); //Web Socket
         } else {
           if (indiceAVG === -1) {
@@ -69,34 +59,43 @@ const scaleController = (() => {
           }
         }
       } else {
-        //BASCULA FINAL (Falta verificar indices)
-        const indiceTotal = data.indexOf('GROSS');
+        //BASCULA FINAL 
+        let dataParse = data.toString().split(" ");
+        dataParse = dataParse[dataParse.length - 1].split("kg")[0]
+        dataParse = parseFloat(dataParse)
+        if ((parseFloat(prevData) != parseFloat(dataParse)) && dataParse >= 0.5) {
+          clearTimeout(time)
+          //console.log(prevData, dataParse)
+          time = setTimeout(() => {
+            console.log(`Peso Bascula ${port}:`, dataParse);
+            //console.log(dataParse, port)
+            postDataScale(port, dataParse); //Web Socket
+            io.emit('server:weight', {scale: port, data: dataParse}); //Socket local
+          }, 3000)
+          prevData = dataParse
+        }
+
+        /*const indiceTotal = data.indexOf('Gross');
         if (indiceTotal !== -1) {
-          
-      
           //Modo Print
-          /*sign[port] = data.substring(indiceTotal + 9, indiceTotal + 10);
-          weight[port] = data.substring(indiceTotal + 10, indiceTotal + 15);
-          weight[port] =
-            sign[port] === '-'
-              ? parseFloat(weight[port]) * -1
-              : parseFloat(weight[port]);
-          //console.log(`Peso DEFINITIVO Bascula ${port}:`, weight[port]);*/
-          console.log(`Peso DEFINITIVO Bascula ${port}:`, weightCont[port]);
-          console.log(dataParse)
-          
-          io.emit('server:weight', {scale: port, data: weightCont[port]}); //Socket local
-          postDataScale(port, weightCont[port]); //Web Socket
+          weight[port] = data.substring(indiceTotal + 6, indiceTotal + 15);
+          console.log(weight[port]);
+          weight[port] = parseFloat(weight[port]);
+          //console.log(`Peso DEFINITIVO Bascula ${port}:`, weight[port]);
+          //io.emit('server:weight', {scale: port, data: weight[port]}); //Socket local
+          //postDataScale(port, weight[port]); //Web Socket
         } else {
           //Modo Continuo
-          signCont[port] = data.substring(1, 2);
-          weightCont[port] = data.substring(2, 10);
+          signCont[port] = data.substring(6, 7);
+          weightCont[port] = data.substring(7, 14);
           weightCont[port] =
             signCont[port] === '-'
               ? parseFloat(weightCont[port]) * -1
               : parseFloat(weightCont[port]);
           //console.log(`Peso Bascula ${port}:`, weightCont[port]);
-        }
+          //io.emit('server:weight', {scale: port, data: weight[port]}); //Socket local
+          //postDataScale(port, weight[port]); //Web Socket
+        }*/
       }
     });
 
@@ -118,7 +117,7 @@ const scaleController = (() => {
   return {
     requestToScale: (port, data = {}) => {
       //console.log(data);
-      const {instruction} = data;
+      const { instruction } = data;
       let command = 'R';
       if (instruction === 'Tare') {
         command = 'T';

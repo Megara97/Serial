@@ -35,20 +35,19 @@ var postDataScale = exports.postDataScale = /*#__PURE__*/function () {
           });
         case 3:
           res = _context.sent;
-          console.log(res.data);
-          _context.next = 7;
+          _context.next = 6;
           return res.data;
-        case 7:
+        case 6:
           return _context.abrupt("return", _context.sent);
-        case 10:
-          _context.prev = 10;
+        case 9:
+          _context.prev = 9;
           _context.t0 = _context["catch"](0);
           console.error(_context.t0);
-        case 13:
+        case 12:
         case "end":
           return _context.stop();
       }
-    }, _callee, null, [[0, 10]]);
+    }, _callee, null, [[0, 9]]);
   }));
   return function postDataScale(_x, _x2) {
     return _ref.apply(this, arguments);

@@ -17,7 +17,7 @@ export const postDataScale = async (port, weight) => {
         },
       },
     });
-    console.log(res.data);
+    //console.log(res.data);
     return await res.data;
   } catch (error) {
     console.error(error);

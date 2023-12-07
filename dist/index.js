@@ -23,11 +23,11 @@ io.on('connection', function (socket) {
 });
 
 //BASCULAS INICIALES (Mini PC)
-_scale["default"].connectScale(1, '/COM6'); //Bascula 1 COM6
-_scale["default"].connectScale(2, '/COM5'); //Bascula 2 COM5
+//scaleController.connectScale(1, '/COM6'); //Bascula 1 COM6
+// scaleController.connectScale(2, '/COM5'); //Bascula 2 COM5
 
 //BASCULA FINAL (PC)
-//scaleController.connectScale(3, '/COM3'); //Bascula 3 COM?
+_scale["default"].connectScale(3, '/COM6'); //Bascula 3 COM6
 
 //Prueba Ubuntu
 //scaleController.connectScale(1, '/dev/ttyACM0');
