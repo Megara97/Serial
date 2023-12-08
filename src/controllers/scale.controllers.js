@@ -15,7 +15,7 @@ const scaleController = (() => {
   const endHour = 20;
 
   function sendCommandToScale(port, command) {
-    ports[3].write(command, err => {
+    ports[port].write(command, err => {
       if (err) {
         console.error('Error al enviar comando:', err.message);
       } else {
@@ -26,8 +26,8 @@ const scaleController = (() => {
 
   function connectSerialPort(port, COM) {
     ports[port] = new SerialPort({path: COM, baudRate: 9600});
-    // parsers[port] = new ReadlineParser({ delimiter: 'g\r\n' }); //BASCULAS INICIALES
-    parsers[port] = new ReadlineParser({delimiter: '\r\n'}); //BASCULA FINAL
+    parsers[port] = new ReadlineParser({delimiter: 'g\r\n'}); //BASCULAS INICIALES
+    //parsers[port] = new ReadlineParser({delimiter: '\r\n'}); //BASCULA FINAL
     ports[port].pipe(parsers[port]);
 
     parsers[port].on('data', data => {
@@ -108,7 +108,7 @@ const scaleController = (() => {
     });
 
     ports[port].on('open', () => {
-      console.log(`Puerto Serial Bascula ${port} Abierto`);
+      console.log(`Puerto serial Bascula ${port} abierto`);
     });
 
     ports[port].on('close', () => {
@@ -117,7 +117,8 @@ const scaleController = (() => {
     });
 
     ports[port].on('error', err => {
-      console.log(`Error Bascula ${port}:`, err.message);
+      const currentDate = new Date().toLocaleString();
+      console.log(`${currentDate} Error Bascula ${port}:`, err.message);
       setTimeout(() => connectSerialPort(port, COM), 5000);
     });
   }

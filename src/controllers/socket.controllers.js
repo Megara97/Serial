@@ -2,8 +2,8 @@ import config from '../config';
 import axios from 'axios';
 
 const scales = {
-  //Bafar: '164',
-  Bafar: '1', //Socket de prueba
+  Bafar: '164',
+  //Bafar: '1', //Socket de prueba
 };
 
 export const postDataScale = async (port, weight) => {
@@ -20,6 +20,7 @@ export const postDataScale = async (port, weight) => {
     //console.log(res.data);
     return await res.data;
   } catch (error) {
-    console.error(error);
+    const currentDate = new Date().toLocaleString();
+    console.log(currentDate, error);
   }
 };
