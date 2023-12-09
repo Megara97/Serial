@@ -16,8 +16,11 @@ var scaleController = function () {
   var signCont = [];
   var prevData = 0;
   var time;
+  var startHour = 6;
+  var endHour = 20;
+  var now = new Date();
   function sendCommandToScale(port, command) {
-    ports[3].write(command, function (err) {
+    ports[port].write(command, function (err) {
       if (err) {
         console.error('Error al enviar comando:', err.message);
       } else {
@@ -30,7 +33,7 @@ var scaleController = function () {
       path: COM,
       baudRate: 9600
     });
-    // parsers[port] = new ReadlineParser({ delimiter: 'g\r\n' }); //BASCULAS INICIALES
+    //parsers[port] = new ReadlineParser({delimiter: 'g\r\n'}); //BASCULAS INICIALES
     parsers[port] = new _serialport.ReadlineParser({
       delimiter: '\r\n'
     }); //BASCULA FINAL
@@ -66,15 +69,16 @@ var scaleController = function () {
           }
         }
       } else {
-        //BASCULA FINAL 
-        var dataParse = data.toString().split(" ");
-        dataParse = dataParse[dataParse.length - 1].split("kg")[0];
+        //BASCULA FINAL
+        var dataParse = data.toString().split(' ');
+        dataParse = dataParse[dataParse.length - 1].split('kg')[0];
         dataParse = parseFloat(dataParse);
-        if (parseFloat(prevData) != parseFloat(dataParse) && dataParse >= 0.5) {
+        now = new Date();
+        if (parseFloat(prevData) != parseFloat(dataParse) && dataParse >= 0 && now.getHours() >= startHour && now.getHours() <= endHour) {
           clearTimeout(time);
           //console.log(prevData, dataParse)
           time = setTimeout(function () {
-            console.log("Peso Bascula ".concat(port, ":"), dataParse);
+            console.log("".concat(now.toLocaleString(), " Peso Bascula ").concat(port, ":"), dataParse);
             //console.log(dataParse, port)
             (0, _socket.postDataScale)(port, dataParse); //Web Socket
             _index.io.emit('server:weight', {
@@ -110,7 +114,7 @@ var scaleController = function () {
     });
 
     ports[port].on('open', function () {
-      console.log("Puerto Serial Bascula ".concat(port, " Abierto"));
+      console.log("Puerto serial Bascula ".concat(port, " abierto"));
     });
     ports[port].on('close', function () {
       console.log("Conexi\xF3n Bascula ".concat(port, " cerrada"));
@@ -119,7 +123,8 @@ var scaleController = function () {
       }, 5000);
     });
     ports[port].on('error', function (err) {
-      console.log("Error Bascula ".concat(port, ":"), err.message);
+      now = new Date().toLocaleString();
+      console.log("".concat(now, " Error Bascula ").concat(port, ":"), err.message);
       setTimeout(function () {
         return connectSerialPort(port, COM);
       }, 5000);

@@ -13,6 +13,7 @@ const scaleController = (() => {
   let time;
   const startHour = 6;
   const endHour = 20;
+  let now = new Date();
 
   function sendCommandToScale(port, command) {
     ports[port].write(command, err => {
@@ -26,8 +27,8 @@ const scaleController = (() => {
 
   function connectSerialPort(port, COM) {
     ports[port] = new SerialPort({path: COM, baudRate: 9600});
-    parsers[port] = new ReadlineParser({delimiter: 'g\r\n'}); //BASCULAS INICIALES
-    //parsers[port] = new ReadlineParser({delimiter: '\r\n'}); //BASCULA FINAL
+    //parsers[port] = new ReadlineParser({delimiter: 'g\r\n'}); //BASCULAS INICIALES
+    parsers[port] = new ReadlineParser({delimiter: '\r\n'}); //BASCULA FINAL
     ports[port].pipe(parsers[port]);
 
     parsers[port].on('data', data => {
@@ -65,17 +66,20 @@ const scaleController = (() => {
         let dataParse = data.toString().split(' ');
         dataParse = dataParse[dataParse.length - 1].split('kg')[0];
         dataParse = parseFloat(dataParse);
-        const now = new Date().getHours();
+        now = new Date();
         if (
           parseFloat(prevData) != parseFloat(dataParse) &&
           dataParse >= 0 &&
-          now >= startHour &&
-          now <= endHour
+          now.getHours() >= startHour &&
+          now.getHours() <= endHour
         ) {
           clearTimeout(time);
           //console.log(prevData, dataParse)
           time = setTimeout(() => {
-            console.log(`Peso Bascula ${port}:`, dataParse);
+            console.log(
+              `${now.toLocaleString()} Peso Bascula ${port}:`,
+              dataParse,
+            );
             //console.log(dataParse, port)
             postDataScale(port, dataParse); //Web Socket
             io.emit('server:weight', {scale: port, data: dataParse}); //Socket local
@@ -117,8 +121,8 @@ const scaleController = (() => {
     });
 
     ports[port].on('error', err => {
-      const currentDate = new Date().toLocaleString();
-      console.log(`${currentDate} Error Bascula ${port}:`, err.message);
+      now = new Date().toLocaleString();
+      console.log(`${now} Error Bascula ${port}:`, err.message);
       setTimeout(() => connectSerialPort(port, COM), 5000);
     });
   }
