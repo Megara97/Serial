@@ -22,16 +22,8 @@ io.on('connection', function (socket) {
   console.log("El cliente con el id ".concat(socket.id, " se a conectado"));
 });
 
-//BASCULAS INICIALES (Mini PC)
-//scaleController.connectScale(1, '/COM6'); //Bascula 1 COM6
-//scaleController.connectScale(2, '/COM5'); //Bascula 2 COM5
-
 //BASCULA FINAL (PC)
-_scale["default"].connectScale(3, '/COM4'); //Bascula 3 COM6
-
-//Prueba Ubuntu
-//scaleController.connectScale(1, '/dev/ttyACM0');
-
+_scale["default"].connectScale(3, '/COM4');
 server.listen(app.get('port'), function () {
   console.log('Server on port', app.get('port'));
 });

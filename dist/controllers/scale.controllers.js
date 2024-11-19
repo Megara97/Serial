@@ -31,15 +31,16 @@ var scaleController = function () {
   function connectSerialPort(port, COM) {
     ports[port] = new _serialport.SerialPort({
       path: COM,
-      baudRate: 9600
+      baudRate: 9600,
+      stopBits: 2
     });
-    //parsers[port] = new ReadlineParser({delimiter: 'g\r\n'}); //BASCULAS INICIALES
+    //parsers[port] = new ReadlineParser({delimiter: ''}); //BASCULAS INICIALES
     parsers[port] = new _serialport.ReadlineParser({
-      delimiter: '\r\n'
+      delimiter: '\n'
     }); //BASCULA FINAL
     ports[port].pipe(parsers[port]);
     parsers[port].on('data', function (data) {
-      //console.log(`Respuesta Bascula ${port}:\n${data.toString()}`);
+      console.log("Respuesta Bascula ".concat(port, ":\n").concat(data.toString()));
       if (port != 3) {
         //BASCULAS INICIALES
         var indiceTotal = data.indexOf('TOTAL');

@@ -26,41 +26,14 @@ const scaleController = (() => {
   }
 
   function connectSerialPort(port, COM) {
-    ports[port] = new SerialPort({path: COM, baudRate: 9600});
-    parsers[port] = new ReadlineParser({delimiter: 'g    \r\n'}); //BASCULAS INICIALES 'g    \r\n'
-    parsers[port] = new ReadlineParser({delimiter: '\r\n'}); //BASCULA FINAL
+    ports[port] = new SerialPort({path: COM, baudRate: 9600,stopBits: 2});
+    parsers[port] = new ReadlineParser({delimiter: '\n'}); //BASCULA FINAL
     ports[port].pipe(parsers[port]);
 
     parsers[port].on('data', data => {
-      //console.log(`Respuesta Bascula ${port}:\n${data.toString()}`);
+      console.log(`Respuesta Bascula ${port}:\n${data.toString()}`);
       if (port != 3) {
         //BASCULAS INICIALES
-        const indiceTotal = data.indexOf('TOTAL');
-        const indiceAVG = data.indexOf('AVG');
-        if (indiceTotal !== -1) {
-          //Modo Print
-          /*sign[port] = data.substring(indiceTotal + 5, indiceTotal + 6);
-          weight[port] = data.substring(indiceTotal + 6, indiceTotal + 14);
-          weight[port] =
-            sign[port] === '-'
-              ? parseFloat(weight[port]) * -1
-              : parseFloat(weight[port]);
-          console.log(`Peso DEFINITIVO Bascula ${port}:`, weight[port]);*/
-          console.log(`Peso DEFINITIVO Bascula ${port}:`, weightCont[port]);
-          io.emit('server:weight', {scale: port, data: weightCont[port]}); //Socket local
-          postDataScale(port, weightCont[port]); //Web Socket
-        } else {
-          if (indiceAVG === -1) {
-            //Modo Continuo
-            signCont[port] = data.substring(5, 6);
-            weightCont[port] = data.substring(6, 13);
-            weightCont[port] =
-              signCont[port] === '-'
-                ? parseFloat(weightCont[port]) * -1
-                : parseFloat(weightCont[port]);
-            //console.log(`Peso Bascula ${port}:`, weightCont[port]);
-          }
-        }
       } else {
         //BASCULA FINAL
         let dataParse = data.toString().split(' ');
